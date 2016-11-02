@@ -1,0 +1,37 @@
+
+
+#para PVM
+LDIR    =  -L$(PVM_ROOT)/lib/$(PVM_ARCH)
+PVMLIB  =  -lpvm3 -lgpvm3
+INCDIR_PVM  =  $(PVM_ROOT)/include
+LIBS    = $(LDIR) $(PVMLIB) 
+SDIR    = ..
+
+
+#COMUNES
+
+# Flags para compilación sin información del depurador (Final)d
+#CFLAGS = -O4 -Wall -W 
+# Flags para compilación con información del depurador
+CFLAGS = -g -O4 -Wall -W
+
+
+$(XDIR):
+	- mkdir $(XDIR)
+
+all: maestro2 trabajador2  funciones.o
+
+maestro2:$(SDIR)/maestro2.c $(XDIR)
+	$(CC) $(CFLAGS) -I $(INCDIR_PVM) -o $@ $(SDIR)/maestro2.c $(LIBS)
+	cp $@  $(HOME)/pvm3/bin/$(PVM_ARCH)
+
+trabajador2: $(SDIR)/trabajador2.c funciones.o $(XDIR)
+	$(CC) -W -Wall $(CFLAGS) -I $(INCDIR_PVM) -o $@ $(SDIR)/$@.c funciones.o $(LIBS)
+	cp $@ $(HOME)/pvm3/bin/$(PVM_ARCH)
+
+funciones.o: $(SDIR)/funciones.c $(SDIR)/mandel.h $(XDIR)
+	$(CC) $(CFLAGS) -c $(SDIR)/funciones.c      
+
+clean:
+	rm maestro2 trabajador2 funciones.o 
+	cd  $(HOME)/pvm3/bin/$(PVM_ARCH) && rm maestro2 trabajador2
